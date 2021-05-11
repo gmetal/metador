@@ -1,0 +1,37 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    ext.kotlinVersion = "1.4.32"
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.2.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "de.mannodermaus.gradle.plugins:android-junit5:1.7.1.1"
+        classpath "com.diffplug.spotless:spotless-plugin-gradle:5.10.2"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
+
+ext {
+    minSdkVersion = 21
+    compileSdkVersion = 30
+    targetSdkVersion = 30
+    coroutinesVersion = "1.4.3"
+    junit5Version = "5.7.0"
+    okHttpVersion = "4.9.0"
+    mockkVersion = "1.11.0"
+    kotlinResult = "1.1.11"
+    composeVersion = "1.0.0-beta05"
+}

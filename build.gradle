@@ -29,9 +29,9 @@ ext {
     compileSdkVersion = 30
     targetSdkVersion = 30
     coroutinesVersion = "1.4.3"
+    dokkaVersion = "1.4.32"
     junit5Version = "5.7.0"
     okHttpVersion = "4.9.0"
     mockkVersion = "1.11.0"
     kotlinResult = "1.1.11"
-    composeVersion = "1.0.0-beta05"
 }

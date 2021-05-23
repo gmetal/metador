@@ -1,6 +1,9 @@
-apply plugin: "com.android.library"
-apply plugin: 'kotlin-android'
-apply plugin: "de.mannodermaus.android-junit5"
+plugins {
+    id "com.android.library"
+    id "kotlin-android"
+    id "de.mannodermaus.android-junit5"
+    id "org.jetbrains.dokka" version "$dokkaVersion"
+}
 apply from: "$project.rootDir/spotless.gradle"
 
 android {
@@ -26,9 +29,42 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = '1.8'
         useIR = true
+    }
+}
+
+dokkaHtml {
+    moduleName.set("Metador")
+    dokkaSourceSets {
+        main {
+            displayName.set("main")
+            includes.from("description.md")
+            jdkVersion.set(8)
+            suppress.set(false)
+            platform.set(org.jetbrains.dokka.Platform.jvm)
+            noStdlibLink.set(false)
+            noJdkLink.set(false)
+            noAndroidSdkLink.set(false)
+        }
+    }
+}
+
+dokkaJavadoc {
+    moduleName.set("Metador")
+    dokkaSourceSets {
+        main {
+            displayName.set("main")
+            includes.from("description.md")
+            jdkVersion.set(8)
+            suppress.set(false)
+            platform.set(org.jetbrains.dokka.Platform.jvm)
+            noStdlibLink.set(false)
+            noJdkLink.set(false)
+            noAndroidSdkLink.set(false)
+        }
     }
 }
 
@@ -61,3 +97,12 @@ task archiveSources(type: Jar) {
     from android.sourceSets.main.java.srcDirs
     exclude("dev/gmetal/metador/response")
 }
+
+
+task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
+    group "publishing"
+    description "Generates javadocJar based on Dokka"
+    archiveClassifier.set("javadoc")
+    from dokkaJavadoc.outputDirectory
+}
+

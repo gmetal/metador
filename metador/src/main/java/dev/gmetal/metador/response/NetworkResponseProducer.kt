@@ -13,8 +13,8 @@ import kotlinx.coroutines.withContext
 /**
  * A ResponseProducer subclass that produces responses from the network
  *
- * @param resourceRetriever the ResourceRetriever to use
- * @param backgroundDispatcher the CoroutineDispatcher to use for doing all operations
+ * @param resourceRetriever the [ResourceRetriever] to use
+ * @param backgroundDispatcher the [CoroutineDispatcher] to use for doing all operations
  */
 class NetworkResponseProducer(
     private val resourceRetriever: ResourceRetriever,

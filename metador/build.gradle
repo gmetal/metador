@@ -38,6 +38,7 @@ android {
 
 dokkaHtml {
     moduleName.set("Metador")
+    offlineMode.set(true)
     dokkaSourceSets {
         main {
             displayName.set("main")
@@ -54,6 +55,7 @@ dokkaHtml {
 
 dokkaJavadoc {
     moduleName.set("Metador")
+    offlineMode.set(true)
     dokkaSourceSets {
         main {
             displayName.set("main")
@@ -101,8 +103,7 @@ task archiveSources(type: Jar) {
 
 task javadocJar(type: Jar, dependsOn: dokkaJavadoc) {
     group "publishing"
-    description "Generates javadocJar based on Dokka"
+    description "Generates javadoc.jar based on Dokka-generated documentation"
     archiveClassifier.set("javadoc")
     from dokkaJavadoc.outputDirectory
 }
-

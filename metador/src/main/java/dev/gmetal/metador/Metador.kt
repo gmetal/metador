@@ -12,7 +12,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.os.Bundle
+import java.io.IOException
 
+/**
+ * The default response cache age, which is 3600 seconds (1 hour)
+ */
 const val DEFAULT_MAX_AGE_CACHE_SECONDS = 60 * 60
 
 /**
@@ -32,7 +37,9 @@ class Metador private constructor(
     private val metadorScope: CoroutineScope = MainScope()
 
     /**
-     * Processes the given request and produces the appropriate response
+     * Processes [Metador.Request]s and produces the corresponding responses
+     *
+     * @param request the [Metador.Request] to process
      */
     fun process(request: Request) {
         metadorScope.launch {
@@ -66,6 +73,9 @@ class Metador private constructor(
 
     private fun Pair<Result<Map<String, String>, Throwable>, Boolean>.isNotCached() = !this.second
 
+    /**
+     * A builder that is used for creating [Metador] instances
+     */
     class Builder {
         private var resourceRetriever: ResourceRetriever = OkHttp3ResourceRetriever()
         private var cacheDirectory: String = ""
@@ -77,6 +87,9 @@ class Metador private constructor(
 
         /**
          * Override the default ResourceRetriever with the specified implementation
+         *
+         * @param resourceRetriever the [ResourceRetriever] instance to use
+         * @return this [Metador.Builder] instance
          */
         fun withResourceRetriever(resourceRetriever: ResourceRetriever): Builder = apply {
             this.resourceRetriever = resourceRetriever
@@ -85,14 +98,20 @@ class Metador private constructor(
         /**
          * Specify the default cache directory to use for caching downloaded resources. This is
          * used by the ResourceRetriever
+         *
+         * @param cacheDirectory the directory location to be used internally for caching
+         * @return this [Metador.Builder] instance
          */
         fun withCacheDirectory(cacheDirectory: String): Builder = apply {
             this.cacheDirectory = cacheDirectory
+
         }
 
         /**
          * Specify the cache size (in bytes) of the physical cache - the cache used for storing
          * downloaded resources by the Resource Retriever
+         *
+         * @return this [Metador.Builder] instance
          */
         fun withPhysicalCacheSize(physicalCacheSizeBytes: Long): Builder = apply {
             this.physicalCacheSize = physicalCacheSizeBytes
@@ -101,6 +120,9 @@ class Metador private constructor(
         /**
          * Specify the maximum number of responses to cache - the cached responses (url, meta map)
          * produced for the specified URL
+         *
+         * @param responseCacheSize and Int containing the max number of cached responses to store
+         * @return this [Metador.Builder] instance
          */
         fun withResponseCacheSize(responseCacheSize: Int): Builder = apply {
             this.responseCacheSize = responseCacheSize
@@ -109,6 +131,9 @@ class Metador private constructor(
         /**
          * Specify the Coroutine Dispatcher to be used when executing the background
          * operations
+         *
+         * @param backgroundDispatcher the background [CoroutineDispatcher] to use
+         * @return this [Metador.Builder] instance
          */
         internal fun withBackgroundDispatcher(backgroundDispatcher: CoroutineDispatcher): Builder =
             apply {
@@ -119,6 +144,9 @@ class Metador private constructor(
          * Specify the response producer responsible for controlling access to cached responses.
          * This is mainly used for testing purposes. Using this method will override the
          * responseCacheSize variable
+         *
+         * @param cachedResponseProducer the overridden [CachedResponseProducer] to use
+         * @return this [Metador.Builder] instance
          */
         internal fun withCachedResponseProducer(cachedResponseProducer: CachedResponseProducer) =
             apply {
@@ -129,6 +157,9 @@ class Metador private constructor(
          * Specify the network response producer, responsible for controlling access to network
          * responses. This is mainly used for testing purposes. Using this method will override
          * the resource retriever
+         *
+         * @param networkResponseProducer the overridden [ResponseProducer] to use
+         * @return this [Metador.Builder] instance
          */
         internal fun withNetworkResponseProducer(networkResponseProducer: ResponseProducer) =
             apply {
@@ -136,7 +167,9 @@ class Metador private constructor(
             }
 
         /**
-         * Creates an returns a Metador instance
+         * Creates an returns a [Metador] instance
+         *
+         * @return a new [Metador] instance as configured through this builder
          */
         fun build(): Metador =
             Metador(
@@ -153,13 +186,18 @@ class Metador private constructor(
     }
 
     companion object {
+        /**
+         * Convenience method for quickly creating a [Request.Builder] from the specified URL
+         *
+         * @param url a string to the resource's URL for which a [Request] will be built
+         */
         @JvmStatic
         fun request(url: String): Request.Builder =
             Request.Builder(url)
     }
 
     /**
-     * A Metador request that can be used to retrieve the metadata of a specified network resource
+     * A [Metador] request that can be used to retrieve the metadata of a specified network resource
      */
     class Request internal constructor(
         val uri: String,
@@ -171,9 +209,16 @@ class Metador private constructor(
         /**
          * Convenience method to return whether a cached response is acceptable or whether we should
          * request a response from the server
+
+         * @return true if a cache response can be used, or false otherwise
          */
         fun cachedResponseAllowed(): Boolean = (maxSecondsCached > 0)
 
+        /**
+         * Create a convenient Builder instance to configure a new [Metador.Request] object
+         *
+         * @param url the url that contains the resource which will be used for extracting data
+         */
         class Builder(val url: String) {
             private var successCallback: SuccessCallback? = null
             private var failureCallback: FailureCallback? = null
@@ -183,6 +228,9 @@ class Metador private constructor(
             /**
              * The callback to be used for notifying about a successful result
              * This is required.
+             *
+             * @param success the [SuccessCallback] that will receive a success value
+             * @return this [Request.Builder] instance
              */
             fun onSuccess(success: SuccessCallback): Builder = apply {
                 successCallback = success
@@ -190,13 +238,20 @@ class Metador private constructor(
 
             /**
              * An optional callback to be used for notifying on failed request.
+             *
+             * @param failure the [FailureCallback] to be called upon failure
+             * @return this [Request.Builder] instance
              */
             fun onFailure(failure: FailureCallback): Builder = apply {
                 failureCallback = failure
             }
 
             /**
-             * Override the default ResourceParserDelegate with the specified implementation
+             * Override the default [ResourceParserDelegate] with the specified implementation
+             *
+             * @param resourceParserDelegate the custom [ResourceParserDelegate] to use when
+             *        processing the request
+             * @return this [Request.Builder] instance
              */
             fun withResourceParser(resourceParserDelegate: ResourceParserDelegate): Builder =
                 apply {
@@ -206,6 +261,9 @@ class Metador private constructor(
             /**
              * The maximum number of seconds that a cached response can be reused.
              * Default value is 3600 seconds (1 hour)
+             *
+             * @param age an integer, the number of seconds until a cached response is acceptable
+             * @return this [Request.Builder] instance
              */
             fun maximumSecondsCached(age: Int = DEFAULT_MAX_AGE_CACHE_SECONDS): Builder = apply {
                 maxSecondsCached = age
@@ -214,11 +272,18 @@ class Metador private constructor(
             /**
              * Create a request that will completely bypass any cached responses and retrieve data
              * from the network
+             *
+             * @return this [Request.Builder] instance
              */
             fun requestFromNetwork(): Builder = apply {
                 maxSecondsCached = 0
             }
 
+            /**
+             * Creates a [Metador.Request] instance
+             *
+             * @return the [Metador.Request] as configured with this builder
+             */
             fun build(): Request =
                 Request(
                     url,
@@ -235,6 +300,11 @@ class Metador private constructor(
      * Callback interface for receiving the parsed Meta elements
      */
     fun interface SuccessCallback {
+        /**
+         * Called upon successful completion of the resource downloading and parsing
+         *
+         * @param result a [Map]<[String], [String]> that contains the extracted data
+         */
         fun onSuccess(result: Map<String, String>)
     }
 
@@ -242,6 +312,12 @@ class Metador private constructor(
      * Callback interface for receiving errors
      */
     fun interface FailureCallback {
+        /**
+         * Called in case an error occurs while a Request is in progress. The error may be
+         * related with the resource downloading or the parsing.
+         *
+         * @param throwable the [Throwable] instance of the occurred error
+         */
         fun onError(throwable: Throwable)
     }
 }

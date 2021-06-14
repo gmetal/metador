@@ -12,8 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.os.Bundle
-import java.io.IOException
 
 /**
  * The default response cache age, which is 3600 seconds (1 hour)
@@ -104,7 +102,6 @@ class Metador private constructor(
          */
         fun withCacheDirectory(cacheDirectory: String): Builder = apply {
             this.cacheDirectory = cacheDirectory
-
         }
 
         /**

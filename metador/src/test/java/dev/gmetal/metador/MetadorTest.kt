@@ -171,9 +171,9 @@ class MetadorTest {
 
             metador.process(request)
 
-            verify {mockCachedResponseProducer.canHandleRequest(eq(request))}
+            verify { mockCachedResponseProducer.canHandleRequest(eq(request)) }
             verify { mockSuccessCallback.onSuccess(expectedResult) }
-            verify {mockNetworkResponseProducer wasNot called}
+            verify { mockNetworkResponseProducer wasNot called }
             coVerify(exactly = 1) { mockCachedResponseProducer.produceResponse(request) }
             verify(exactly = 0) { mockCachedResponseProducer.cacheResponse(any(), any(), any()) }
         }

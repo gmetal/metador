@@ -7,7 +7,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Build
-        run: ./gradlew build
+        run: ./gradlew assembleDebug
   test:
     needs: build
     runs-on: ubuntu-latest
@@ -16,3 +16,13 @@ jobs:
         uses: actions/checkout@v2
       - name: Test
         run: ./gradlew testDebug
+  code-analysis:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Android lint
+        run: ./gradlew lintDebug
+      - name: Spotless
+        run: ./gradlew spotlessCheck

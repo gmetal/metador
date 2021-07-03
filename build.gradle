@@ -33,5 +33,6 @@ ext {
     kotestVersion = "4.6.0"
     okHttpVersion = "4.9.0"
     mockkVersion = "1.11.0"
-    kotlinResult = "1.1.11"
+    kotlinResultVersion = "1.1.11"
+    slf4jVersion = "1.7.30"
 }

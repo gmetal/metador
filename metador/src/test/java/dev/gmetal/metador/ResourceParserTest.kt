@@ -1,56 +1,46 @@
 package dev.gmetal.metador
 
-import io.mockk.MockKAnnotations
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.runBlockingTest
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.hamcrest.CoreMatchers.`is` as _is
 
-@ExperimentalCoroutinesApi
-class ResourceParserTest {
-    @MockK
+class ResourceParserTest : BehaviorSpec({
     lateinit var mockResourceParserDelegate: ResourceParserDelegate
+    lateinit var objectInTest: ResourceParser
+    val testCoroutineDispatcher = TestCoroutineDispatcher()
 
-    private lateinit var objectInTest: ResourceParser
-
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
-
-    @BeforeEach
-    fun setup() {
-        MockKAnnotations.init(this)
+    beforeContainer {
+        mockResourceParserDelegate = mockk()
         objectInTest = ResourceParser(testCoroutineDispatcher)
     }
 
-    @Test
-    fun `the resource parser delegates it's work to the supplied ResourceParserDelegate and returns the result to the caller`() =
-        runBlockingTest {
+    Given("a ResourceParser") {
+        When("it is requested to parse a resource") {
             val fakeResource = "fake_resource"
             val expectedResult = mapOf("key" to "value")
             every { mockResourceParserDelegate.parseResource(fakeResource) } returns expectedResult
 
             val result = objectInTest.parseResource(mockResourceParserDelegate, fakeResource)
-
-            verify { mockResourceParserDelegate.parseResource(fakeResource) }
-            assertThat(result, _is(expectedResult))
+            Then("it produces the result by delegating its work to the supplied ResourceParserDelegate") {
+                verify { mockResourceParserDelegate.parseResource(fakeResource) }
+                result shouldBe expectedResult
+            }
         }
 
-    @Test
-    fun `exceptions thrown by the ResourceParserDelegate are propagated to the caller`() =
-        runBlockingTest {
+        When("an exception is thrown by the ResourceParserDelegate") {
             val fakeResource = "fake_resource"
             every { mockResourceParserDelegate.parseResource(fakeResource) } throws RuntimeException(
                 "Error"
             )
-
-            assertThrows<RuntimeException> {
-                objectInTest.parseResource(mockResourceParserDelegate, fakeResource)
+            Then("it is propagated to the caller") {
+                shouldThrow<RuntimeException> {
+                    objectInTest.parseResource(mockResourceParserDelegate, fakeResource)
+                }
             }
         }
-}
+    }
+})

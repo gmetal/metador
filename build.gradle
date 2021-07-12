@@ -30,8 +30,9 @@ ext {
     targetSdkVersion = 30
     coroutinesVersion = "1.4.3"
     dokkaVersion = "1.4.32"
-    junit5Version = "5.7.0"
+    kotestVersion = "4.6.0"
     okHttpVersion = "4.9.0"
     mockkVersion = "1.11.0"
-    kotlinResult = "1.1.11"
+    kotlinResultVersion = "1.1.11"
+    slf4jVersion = "1.7.30"
 }

@@ -1,71 +1,82 @@
 package dev.gmetal.metador
 
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
-import org.hamcrest.CoreMatchers.not
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
-import org.hamcrest.CoreMatchers.`is` as _is
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 
-class MetadorRequestTest {
-
+class MetadorRequestTest : BehaviorSpec({
     lateinit var mockSuccess: Metador.SuccessCallback
     lateinit var mockFailure: Metador.FailureCallback
 
-    @BeforeEach
-    fun setup() {
+    beforeContainer {
         mockSuccess = mockk()
         mockFailure = mockk()
+        Dispatchers.setMain(TestCoroutineDispatcher())
     }
 
-    @Test
-    fun `building a metador request without a success callback results in a RuntimeException`() {
+    afterContainer {
+        Dispatchers.resetMain()
+    }
+
+    Given("a String URL") {
         val url = "http://localhost/test"
 
-        assertThrows<RuntimeException> {
-            Metador.Request.Builder(url)
+        When("we attempt to create a Metador Request through the builder with a success callback") {
+            Then("a RuntimeException is thrown") {
+                shouldThrow<RuntimeException> {
+                    Metador.Request.Builder(url)
+                        .build()
+                }
+            }
+        }
+
+        When("we supply a success callback to the Metador Request builder") {
+            val request = Metador.Request.Builder(url)
+                .onSuccess(mockSuccess)
                 .build()
+
+            Then("the Metador Request created uses the supplied URI and success callback ") {
+                request.uri shouldBe url
+                request.successCallback shouldBe mockSuccess
+            }
+
+            Then("the Metador Request created uses the default maximum number of seconds cached value  ") {
+                request.maxSecondsCached shouldBe DEFAULT_MAX_AGE_CACHE_SECONDS
+            }
+
+            Then("the Metador Request created uses a default failure callback") {
+                request.failureCallback shouldNotBe mockFailure
+            }
+        }
+
+        When("we supply all available parameters to the Metador Request builder") {
+            val maxAgeSecondsCached = 50
+
+            val request = Metador.Request.Builder(url)
+                .maximumSecondsCached(maxAgeSecondsCached)
+                .onSuccess(mockSuccess)
+                .onFailure(mockFailure)
+                .build()
+
+            Then("the generated request contains the parameters used") {
+                request.uri shouldBe url
+                request.maxSecondsCached shouldBe maxAgeSecondsCached
+                request.successCallback shouldBe mockSuccess
+                request.failureCallback shouldBe mockFailure
+            }
+        }
+
+        When("we use the Metador.request method") {
+            val requestBuilder: Metador.Request.Builder = Metador.request(url)
+            Then("we receive a default Metador Request builder instance ready for use") {
+                requestBuilder.url shouldBe url
+            }
         }
     }
-
-    @Test
-    fun `metador requests require a URL and a success callback, all other parameters have default values`() {
-        val url = "http://localhost/test"
-
-        val request = Metador.Request.Builder(url)
-            .onSuccess(mockSuccess)
-            .build()
-
-        assertThat(request.uri, _is(url))
-        assertThat(request.maxSecondsCached, _is(DEFAULT_MAX_AGE_CACHE_SECONDS))
-        assertThat(request.successCallback, _is(mockSuccess))
-        assertThat(request.failureCallback, _is(not(mockFailure)))
-    }
-
-    @Test
-    fun `a metador request is created with all parameters passed to a builder`() {
-        val url = "http://localhost/test"
-        val maxAgeSecondsCached = 50
-
-        val request = Metador.Request.Builder(url)
-            .maximumSecondsCached(maxAgeSecondsCached)
-            .onSuccess(mockSuccess)
-            .onFailure(mockFailure)
-            .build()
-
-        assertThat(request.uri, _is(url))
-        assertThat(request.maxSecondsCached, _is(maxAgeSecondsCached))
-        assertThat(request.successCallback, _is(mockSuccess))
-        assertThat(request.failureCallback, _is(mockFailure))
-    }
-
-    @Test
-    fun `the request method creates a default Request Builder for the specified URI`() {
-        val url = "http://localhost/test"
-
-        val requestBuilder: Metador.Request.Builder = Metador.request(url)
-
-        assertThat(requestBuilder.url, _is(url))
-    }
-}
+})

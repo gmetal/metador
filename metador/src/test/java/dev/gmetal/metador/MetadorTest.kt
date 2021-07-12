@@ -3,248 +3,176 @@ package dev.gmetal.metador
 import com.github.michaelbull.result.Ok
 import dev.gmetal.metador.response.CachedResponseProducer
 import dev.gmetal.metador.response.ResponseProducer
-import io.mockk.MockKAnnotations
+import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.shouldBe
 import io.mockk.Runs
 import io.mockk.called
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.coVerifyAll
 import io.mockk.every
-import io.mockk.impl.annotations.MockK
 import io.mockk.just
+import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyAll
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
-import org.hamcrest.MatcherAssert.assertThat
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.hamcrest.CoreMatchers.`is` as _is
 
-@ExperimentalCoroutinesApi
-class MetadorTest {
-    @MockK
+class MetadorTest : BehaviorSpec({
     lateinit var mockResourceRetriever: ResourceRetriever
-
-    @MockK
-    lateinit var mockResourceParserDelegate: ResourceParserDelegate
-
-    @MockK
     lateinit var mockSuccessCallback: Metador.SuccessCallback
-
-    @MockK
     lateinit var mockFailureCallback: Metador.FailureCallback
-
-    @MockK
     lateinit var mockCachedResponseProducer: CachedResponseProducer
-
-    @MockK
     lateinit var mockNetworkResponseProducer: ResponseProducer
 
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
-
-    @BeforeEach
-    fun setup() {
-        MockKAnnotations.init(this)
-        Dispatchers.setMain(testCoroutineDispatcher)
+    beforeContainer {
+        mockResourceRetriever = mockk()
+        mockSuccessCallback = mockk()
+        mockFailureCallback = mockk()
+        mockCachedResponseProducer = mockk()
+        mockNetworkResponseProducer = mockk()
+        Dispatchers.setMain(TestCoroutineDispatcher())
     }
 
-    @Test
-    fun `metador's physical cache and physical size settings are set to the resource retriever, and the response cache size is used in the CachedResponseProducer`() {
+    afterContainer {
+        Dispatchers.resetMain()
+    }
+
+    Given("a set of Metador configuration values") {
         val fakeCacheDirectory = "/tmp/cache"
         val fakeCacheSize = 1024L
         val fakeResponseCacheSize = 50
-        every { mockResourceRetriever.configureCache(any(), any()) } just Runs
 
-        val metador = metadorBuilder(
-            cacheDirectory = fakeCacheDirectory,
-            physicalCacheSize = fakeCacheSize,
-            responseCacheSize = fakeResponseCacheSize,
-            resourceRetriever = mockResourceRetriever,
-        )
+        beforeContainer {
+            every { mockResourceRetriever.configureCache(any(), any()) } just Runs
+        }
 
-        verify { mockResourceRetriever.configureCache(fakeCacheDirectory, fakeCacheSize) }
-        assertThat(metador.cachedResponseProducer.responseCacheSize, _is(fakeResponseCacheSize))
+        When("a Metador instance is created") {
+            val metador = metadorBuilder(
+                cacheDirectory = fakeCacheDirectory,
+                physicalCacheSize = fakeCacheSize,
+                responseCacheSize = fakeResponseCacheSize,
+                resourceRetriever = mockResourceRetriever,
+            )
+
+            Then("the physical cache settings are set in the resource retriever") {
+                verify { mockResourceRetriever.configureCache(fakeCacheDirectory, fakeCacheSize) }
+            }
+            Then("the response cache size is set in the CachedResponseProducer") {
+                metador.cachedResponseProducer.responseCacheSize shouldBe fakeResponseCacheSize
+            }
+        }
     }
 
-    @Test
-    fun `the parsing of retrieved resources is delegated to the request's ResourceParserDelegate`() =
-        runBlockingTest {
-            val fakeResource = "fake_resource"
-            coEvery { mockResourceRetriever.retrieveResource(any()) } returns fakeResource
-            every { mockResourceParserDelegate.parseResource(fakeResource) } returns emptyMap()
-            every { mockResourceRetriever.configureCache(any(), any()) } just Runs
-            val metador = metadorBuilder(resourceRetriever = mockResourceRetriever)
+    Given("a Metador instance") {
+        val fakeResource = "fake_resource"
+        val expectedResult = mapOf("key" to "value")
+        lateinit var request: Metador.Request
+        lateinit var metador: Metador
 
-            metador.process(
-                defaultRequest(
-                    "http://localhost/resource_parser_delegate",
-                    mockResourceParserDelegate
-                )
-            )
-
-            verifyAll {
-                mockFailureCallback wasNot called
-                mockResourceParserDelegate.parseResource(fakeResource)
-            }
-        }
-
-    @Test
-    fun `exceptions thrown by the resource retriever are propagated to the failure callback`() =
-        runBlockingTest {
-            every { mockResourceRetriever.configureCache(any(), any()) } just Runs
-            coEvery { mockResourceRetriever.retrieveResource(any()) } throws ResourceNotFoundException
-            val metador = metadorBuilder(resourceRetriever = mockResourceRetriever)
-
-            metador.process(defaultRequest("http://localhost/test"))
-
-            verifyAll {
-                mockFailureCallback.onError(ResourceNotFoundException)
-                mockSuccessCallback wasNot called
-            }
-        }
-
-    @Test
-    fun `exceptions thrown by the resource parser are propagated to the failure callback`() =
-        runBlockingTest {
-            val fakeResource = "fake_resource"
-            coEvery { mockResourceRetriever.retrieveResource(any()) } returns fakeResource
-            every { mockResourceRetriever.configureCache(any(), any()) } just Runs
-            every { mockResourceParserDelegate.parseResource(fakeResource) } throws RuntimeException(
-                "Unknown error"
-            )
-            val metador = metadorBuilder(resourceRetriever = mockResourceRetriever)
-
-            metador.process(
-                defaultRequest("http://localhost/test", mockResourceParserDelegate)
-            )
-
-            verifyAll {
-                mockFailureCallback.onError(any<RuntimeException>())
-                mockSuccessCallback wasNot called
-            }
-        }
-
-    @Test
-    fun `the successful result is sent to the success callback and cached`() =
-        runBlockingTest {
-            val fakeResource = "fake_resource"
-            val expectedResult = mapOf("key" to "value")
-            every { mockSuccessCallback.onSuccess(expectedResult) } just Runs
+        beforeContainer {
             every { mockResourceRetriever.configureCache(any(), any()) } just Runs
             every { mockCachedResponseProducer.cacheResponse(any(), any(), any()) } just Runs
             every { mockCachedResponseProducer.canHandleRequest(any()) } returns false
-            coEvery { mockResourceRetriever.retrieveResource(any()) } returns fakeResource
-            every { mockResourceParserDelegate.parseResource(fakeResource) } returns expectedResult
-            val metador = metadorBuilder(
+            every { mockSuccessCallback.onSuccess(expectedResult) } just Runs
+            metador = metadorBuilder(
                 resourceRetriever = mockResourceRetriever,
-                cachedResponseProducer = mockCachedResponseProducer
+                cachedResponseProducer = mockCachedResponseProducer,
+                networkResponseProducer = mockNetworkResponseProducer
             )
-
-            metador.process(defaultRequest("http://localhost/test", mockResourceParserDelegate))
-
-            verifyAll {
-                mockSuccessCallback.onSuccess(expectedResult)
-                mockFailureCallback wasNot called
-            }
+            request = defaultRequest(
+                "http://localhost/resource_parser_delegate",
+                mockSuccessCallback,
+                mockFailureCallback
+            )
         }
 
-    @Test
-    fun `cached responses will be preferred if available and the result is not cached again`() =
-        runBlockingTest {
-            val fakeUri = "http://localhost/test"
-            val expectedResult = mapOf("key" to "value")
-            val request = defaultRequest(fakeUri, mockResourceParserDelegate)
-            every { mockSuccessCallback.onSuccess(expectedResult) } just Runs
+        When("a cached response is available") {
             every { mockCachedResponseProducer.canHandleRequest(any()) } returns true
             coEvery { mockCachedResponseProducer.produceResponse(request) } returns Ok(
                 expectedResult
             )
-            val metador = metadorBuilder(
-                resourceRetriever = mockResourceRetriever,
-                cachedResponseProducer = mockCachedResponseProducer,
-                networkResponseProducer = mockNetworkResponseProducer
-            )
 
             metador.process(request)
 
-            verify { mockCachedResponseProducer.canHandleRequest(eq(request)) }
-            verify { mockSuccessCallback.onSuccess(expectedResult) }
-            verify { mockNetworkResponseProducer wasNot called }
-            coVerify(exactly = 1) { mockCachedResponseProducer.produceResponse(request) }
-            verify(exactly = 0) { mockCachedResponseProducer.cacheResponse(any(), any(), any()) }
+            Then("it is returned and not cached again") {
+                verify { mockCachedResponseProducer.canHandleRequest(eq(request)) }
+                verify { mockSuccessCallback.onSuccess(expectedResult) }
+                verify { mockNetworkResponseProducer wasNot called }
+                coVerify(exactly = 1) { mockCachedResponseProducer.produceResponse(request) }
+                verify(exactly = 0) {
+                    mockCachedResponseProducer.cacheResponse(
+                        any(),
+                        any(),
+                        any()
+                    )
+                }
+            }
         }
 
-    @Test
-    fun `when no cached responses are available then the response will be requested from the network`() =
-        runBlockingTest {
-            val fakeUri = "http://localhost/test"
-            val expectedResult = mapOf("key" to "value")
-            every { mockResourceRetriever.configureCache(any(), any()) } just Runs
+        When("no cached responses are available") {
             every { mockCachedResponseProducer.cacheResponse(any(), any(), any()) } just Runs
-            every { mockSuccessCallback.onSuccess(any()) } just Runs
             every { mockCachedResponseProducer.canHandleRequest(any()) } returns false
             coEvery { mockNetworkResponseProducer.produceResponse(any()) } returns Ok(
                 expectedResult
             )
-            val metador = metadorBuilder(
-                cachedResponseProducer = mockCachedResponseProducer,
-                networkResponseProducer = mockNetworkResponseProducer
-            )
-            val request = defaultRequest(fakeUri, mockResourceParserDelegate)
 
             metador.process(request)
 
-            verifyAll {
-                mockCachedResponseProducer.canHandleRequest(request)
-                mockCachedResponseProducer.cacheResponse(
-                    fakeUri,
-                    expectedResult,
-                    request.maxSecondsCached * 1000L
-                )
-                mockSuccessCallback.onSuccess(expectedResult)
+            Then("the remote resource will be retrieved from the network and cached") {
+                verifyAll {
+                    mockCachedResponseProducer.canHandleRequest(request)
+                    mockCachedResponseProducer.cacheResponse(
+                        request.uri,
+                        expectedResult,
+                        request.maxSecondsCached * 1000L
+                    )
+                    mockSuccessCallback.onSuccess(expectedResult)
+                }
+                coVerifyAll {
+                    mockNetworkResponseProducer.produceResponse(request)
+                }
+                coVerify(exactly = 0) { mockCachedResponseProducer.produceResponse(any()) }
             }
-            coVerifyAll {
-                mockNetworkResponseProducer.produceResponse(request)
-            }
-            coVerify(exactly = 0) { mockCachedResponseProducer.produceResponse(any()) }
         }
+    }
+})
 
-    private fun defaultRequest(
-        uri: String,
-        resourceParserDelegate: ResourceParserDelegate = HtmlMetaExtractor()
-    ): Metador.Request =
-        Metador.Request.Builder(uri)
-            .withResourceParser(resourceParserDelegate)
-            .onSuccess(mockSuccessCallback)
-            .onFailure(mockFailureCallback)
-            .build()
+private fun metadorBuilder(
+    resourceRetriever: ResourceRetriever = OkHttp3ResourceRetriever(),
+    cacheDirectory: String = "",
+    physicalCacheSize: Long = DEFAULT_PHYSICAL_CACHE_SIZE_BYTES,
+    responseCacheSize: Int = DEFAULT_MAX_RESPONSE_CACHE_SIZE,
+    cachedResponseProducer: CachedResponseProducer? = null,
+    networkResponseProducer: ResponseProducer? = null
+) = Metador.Builder()
+    .withCacheDirectory(cacheDirectory)
+    .withPhysicalCacheSize(physicalCacheSize)
+    .withResponseCacheSize(responseCacheSize)
+    .withResourceRetriever(resourceRetriever)
+    .withBackgroundDispatcher(TestCoroutineDispatcher())
+    .apply {
+        if (cachedResponseProducer != null) {
+            withCachedResponseProducer(cachedResponseProducer)
+        }
+    }
+    .apply {
+        if (networkResponseProducer != null) {
+            withNetworkResponseProducer(networkResponseProducer)
+        }
+    }
+    .build()
 
-    private fun metadorBuilder(
-        resourceRetriever: ResourceRetriever = OkHttp3ResourceRetriever(),
-        cacheDirectory: String = "",
-        physicalCacheSize: Long = DEFAULT_PHYSICAL_CACHE_SIZE_BYTES,
-        responseCacheSize: Int = DEFAULT_MAX_RESPONSE_CACHE_SIZE,
-        cachedResponseProducer: CachedResponseProducer? = null,
-        networkResponseProducer: ResponseProducer? = null
-    ) = Metador.Builder()
-        .withCacheDirectory(cacheDirectory)
-        .withPhysicalCacheSize(physicalCacheSize)
-        .withResponseCacheSize(responseCacheSize)
-        .withResourceRetriever(resourceRetriever)
-        .withBackgroundDispatcher(testCoroutineDispatcher)
-        .apply {
-            if (cachedResponseProducer != null) {
-                withCachedResponseProducer(cachedResponseProducer)
-            }
-        }
-        .apply {
-            if (networkResponseProducer != null) {
-                withNetworkResponseProducer(networkResponseProducer)
-            }
-        }
+private fun defaultRequest(
+    uri: String,
+    successCallback: Metador.SuccessCallback,
+    failureCallback: Metador.FailureCallback,
+    resourceParserDelegate: ResourceParserDelegate = HtmlMetaExtractor()
+): Metador.Request =
+    Metador.Request.Builder(uri)
+        .withResourceParser(resourceParserDelegate)
+        .onSuccess(successCallback)
+        .onFailure(failureCallback)
         .build()
-}

@@ -1,4 +1,5 @@
 # Metador - the HTML metadata retriever library
+![Main branch status](https://github.com/gmetal/metador/actions/workflows/main-build.yml/badge.svg?branch=main)
 
 Metador is an easy to use library for retrieving the META tags of an HTML page, for use in an Android
 mobile application. It can be used in scenarios where the developer would have to extract the
@@ -16,4 +17,4 @@ comprised of an in-memory cache and a disk cache. The in-memory cache stores the
 for a specific URL. The disk cache stores the HTML page, which can be reprocessed, if it has not
 been modified in the server.
 
-![Main branch status](https://github.com/gmetal/metador/actions/workflows/main-build.yml/badge.svg?branch=main)
+

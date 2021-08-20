@@ -16,11 +16,13 @@ jobs:
         uses: actions/checkout@v2
       - name: Test
         run: ./gradlew testDebug
-      - name: Archive test results
-        uses: actions/upload-artifact@v2
+      - name: Generate Test Report
+        uses: dorny/test-reporter@v1
         if: always()
         with:
+          name: Kotest Tests
           path: metador/build/test-results/test/*.xml
+          reporter: java-junit
   code-analysis:
     needs: test
     runs-on: ubuntu-latest

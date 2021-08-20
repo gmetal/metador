@@ -90,6 +90,7 @@ dependencies {
     // Kotest dependencies
     testImplementation "io.kotest:kotest-runner-junit5:$kotestVersion"
     testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
+    testImplementation "io.kotest:kotest-extensions-junitxml:$kotestVersion"
     testImplementation "io.kotest.extensions:kotest-extensions-mockserver:1.0.0"
 
     // (Required) Writing and executing Unit Tests on the JUnit Platform

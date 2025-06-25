@@ -12,8 +12,6 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -31,8 +29,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
-        useIR = true
+        jvmTarget = "1.8"
     }
 
     testOptions {
@@ -40,6 +37,7 @@ android {
             useJUnitPlatform()
         }
     }
+    namespace "dev.gmetal.metador"
 }
 
 dokkaHtml {
@@ -99,10 +97,13 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion"
     testImplementation "org.slf4j:slf4j-simple:$slf4jVersion"
     testImplementation "org.slf4j:slf4j-api:$slf4jVersion"
+    testImplementation "io.mockk:mockk-agent-jvm:1.12.0"
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:1.5.21"
+    testImplementation "org.jdom:jdom2:2.0.6"
 }
 
 task archiveSources(type: Jar) {
-    classifier('sources')
+//    classifier("sources")
     from android.sourceSets.main.java.srcDirs
     exclude("dev/gmetal/metador/response")
 }

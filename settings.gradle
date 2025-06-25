@@ -1,2 +1,2 @@
 rootProject.name = "metador"
-include ':sample', ':metador'
+include ":sample", ":metador"

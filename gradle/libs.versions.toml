@@ -1,0 +1,24 @@
+[versions]
+agp = "8.11.0"
+kotlin = "1.9.22"
+minSdk = "21"
+compileSdk = "35"
+targetSdk = "35"
+coroutines = "1.4.3"
+dokka = "1.9.20"
+kotest = "4.6.0"
+okhttp = "4.9.0"
+mockk = "1.11.0"
+kotlinResult = "1.1.11"
+slf4j = "1.7.30"
+
+[libraries]
+
+[plugins]
+androidApplication = { id = "com.android.application", version.ref = "agp" }
+androidLibrary = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+android-junit5 = { id = "de.mannodermaus.android-junit5", version = "1.13.0.0" }
+spotless = { id = "com.diffplug.spotless", version = "7.0.4" }
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

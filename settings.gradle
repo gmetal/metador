@@ -1,2 +1,0 @@
-rootProject.name = "metador"
-include ":sample", ":metador"

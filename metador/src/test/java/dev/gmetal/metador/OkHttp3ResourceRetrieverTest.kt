@@ -12,7 +12,9 @@ import io.kotest.extensions.mockserver.MockServerListener
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.instanceOf
 import io.mockk.mockk
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.mockserver.client.MockServerClient
 import org.mockserver.configuration.ConfigurationProperties
 import org.mockserver.mock.Expectation
@@ -26,6 +28,7 @@ import org.mockserver.model.RequestDefinition
 import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_NOT_FOUND
 
+@ExperimentalCoroutinesApi
 class OkHttp3ResourceRetrieverTest : BehaviorSpec({
     lateinit var mockMetadorSuccess: Metador.SuccessCallback
     lateinit var mockMetadorFailure: Metador.FailureCallback
@@ -33,7 +36,7 @@ class OkHttp3ResourceRetrieverTest : BehaviorSpec({
 
     lateinit var resourceRetrieverInTest: OkHttp3ResourceRetriever
 
-    val testCoroutineDispatcher = TestCoroutineDispatcher()
+    val testCoroutineDispatcher = UnconfinedTestDispatcher()
     fun metadorRequest(uri: String, maxSecondsCached: Int = DEFAULT_MAX_AGE_CACHE_SECONDS) =
         Metador.Request(
             uri,
@@ -57,7 +60,7 @@ class OkHttp3ResourceRetrieverTest : BehaviorSpec({
     }
 
     afterContainer {
-        testCoroutineDispatcher.cleanupTestCoroutines()
+        testCoroutineDispatcher.cancel()
     }
     lateinit var currentExpections: Array<Expectation>
 

@@ -16,10 +16,12 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyAll
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 
+@ExperimentalCoroutinesApi
 class MetadorTest : BehaviorSpec({
     lateinit var mockResourceRetriever: ResourceRetriever
     lateinit var mockSuccessCallback: Metador.SuccessCallback
@@ -33,7 +35,7 @@ class MetadorTest : BehaviorSpec({
         mockFailureCallback = mockk()
         mockCachedResponseProducer = mockk()
         mockNetworkResponseProducer = mockk()
-        Dispatchers.setMain(TestCoroutineDispatcher())
+        Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     afterContainer {
@@ -152,7 +154,7 @@ private fun metadorBuilder(
     .withPhysicalCacheSize(physicalCacheSize)
     .withResponseCacheSize(responseCacheSize)
     .withResourceRetriever(resourceRetriever)
-    .withBackgroundDispatcher(TestCoroutineDispatcher())
+    .withBackgroundDispatcher(UnconfinedTestDispatcher())
     .apply {
         if (cachedResponseProducer != null) {
             withCachedResponseProducer(cachedResponseProducer)

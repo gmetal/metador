@@ -16,15 +16,17 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
+@ExperimentalCoroutinesApi
 class NetworkResponseProducerTest : BehaviorSpec({
     lateinit var mockResourceRetriever: ResourceRetriever
     lateinit var mockResourceParserDelegate: ResourceParserDelegate
     lateinit var mockSuccessCallback: Metador.SuccessCallback
     lateinit var mockFailureCallback: Metador.FailureCallback
     lateinit var networkResponseProducerInTest: NetworkResponseProducer
-    val testCoroutineDispatcher: CoroutineDispatcher = TestCoroutineDispatcher()
+    val testCoroutineDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
     fun defaultRequest(
         uri: String,

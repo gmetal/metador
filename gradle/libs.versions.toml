@@ -3,7 +3,7 @@ agp = "8.11.0"
 minSdk = "21"
 compileSdk = "35"
 targetSdk = "35"
-kotlin = "1.9.22"
+kotlin = "2.1.21"
 annotation = "1.9.1"
 appcompat = "1.7.1"
 constraintlayout = "2.2.1"
@@ -14,16 +14,18 @@ junit = "1.2.1"
 material = "1.12.0"
 slf4jApi = "2.0.17"
 slf4jSimple = "2.0.17"
-coroutines = "1.8.0"
-dokka = "1.9.20"
+coroutines = "1.10.2"
+dokka = "2.0.0"
 kotest = "4.6.0"
 kotest-mockwebserver = "1.0.0"
 okhttp = "4.12.0"
-mockk = "1.11.0"
-mockk-agent = "1.11.0"
+mockk = "1.14.4"
+mockk-agent = "1.14.4"
 kotlinResult = "1.1.11"
 slf4j = "1.7.30"
 jdom2 = "2.0.6.1"
+spotless = "7.0.4"
+android-junit5 = "1.13.0.0"
 
 [libraries]
 annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
@@ -57,6 +59,6 @@ androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-android-junit5 = { id = "de.mannodermaus.android-junit5", version = "1.13.0.0" }
-spotless = { id = "com.diffplug.spotless", version = "7.0.4" }
+android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref= "android-junit5" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

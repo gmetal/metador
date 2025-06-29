@@ -6,10 +6,12 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 
+@ExperimentalCoroutinesApi
 class MetadorRequestTest : BehaviorSpec({
     lateinit var mockSuccess: Metador.SuccessCallback
     lateinit var mockFailure: Metador.FailureCallback
@@ -17,7 +19,7 @@ class MetadorRequestTest : BehaviorSpec({
     beforeContainer {
         mockSuccess = mockk()
         mockFailure = mockk()
-        Dispatchers.setMain(TestCoroutineDispatcher())
+        Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     afterContainer {

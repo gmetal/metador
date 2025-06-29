@@ -219,7 +219,7 @@ class OkHttp3ResourceRetrieverTest : BehaviorSpec({
     }
 })
 
-private inline fun responseUrl(url: String) = "$BASE_URL/$url"
+private fun responseUrl(url: String) = "$BASE_URL/$url"
 private fun MockServerClient.addExpectation(
     resource: String,
     toResponse: HttpResponse

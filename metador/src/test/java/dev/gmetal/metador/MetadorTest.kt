@@ -1,6 +1,5 @@
 package dev.gmetal.metador
 
-import com.github.michaelbull.result.Ok
 import dev.gmetal.metador.response.CachedResponseProducer
 import dev.gmetal.metador.response.ResponseProducer
 import io.kotest.core.spec.style.BehaviorSpec
@@ -93,7 +92,7 @@ class MetadorTest : BehaviorSpec({
 
         When("a cached response is available") {
             every { mockCachedResponseProducer.canHandleRequest(any()) } returns true
-            coEvery { mockCachedResponseProducer.produceResponse(request) } returns Ok(
+            coEvery { mockCachedResponseProducer.produceResponse(request) } returns Result.success(
                 expectedResult
             )
 
@@ -117,7 +116,7 @@ class MetadorTest : BehaviorSpec({
         When("no cached responses are available") {
             every { mockCachedResponseProducer.cacheResponse(any(), any(), any()) } just Runs
             every { mockCachedResponseProducer.canHandleRequest(any()) } returns false
-            coEvery { mockNetworkResponseProducer.produceResponse(any()) } returns Ok(
+            coEvery { mockNetworkResponseProducer.produceResponse(any()) } returns Result.success(
                 expectedResult
             )
 
@@ -142,6 +141,7 @@ class MetadorTest : BehaviorSpec({
     }
 })
 
+@ExperimentalCoroutinesApi
 private fun metadorBuilder(
     resourceRetriever: ResourceRetriever = OkHttp3ResourceRetriever(),
     cacheDirectory: String = "",

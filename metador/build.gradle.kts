@@ -61,7 +61,6 @@ dependencies {
     implementation(libs.kotlin.stdlib.jdk7)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
-    implementation(libs.kotlin.result)
 
     // Kotest dependencies
     testImplementation(libs.kotest.runner.junit5)
@@ -71,7 +70,6 @@ dependencies {
     testImplementation(libs.kotest.datatest)
 
     // (Required) Writing and executing Unit Tests on the JUnit Platform
-    testImplementation(libs.kotlin.result)
     testImplementation(libs.mockk)
     testImplementation(libs.jetbrains.kotlinx.coroutines.test)
     testImplementation(libs.slf4j.simple)

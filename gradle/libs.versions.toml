@@ -16,8 +16,8 @@ slf4jApi = "2.0.17"
 slf4jSimple = "2.0.17"
 coroutines = "1.10.2"
 dokka = "2.0.0"
-kotest = "4.6.0"
-kotest-mockwebserver = "1.0.0"
+kotest = "5.9.1"
+kotest-mockwebserver = "1.3.0"
 okhttp = "4.12.0"
 mockk = "1.14.4"
 mockk-agent = "1.14.4"
@@ -50,6 +50,7 @@ slf4j-simple = { module = "org.slf4j:slf4j-simple", version.ref = "slf4jSimple" 
 slf4j-slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4jApi" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+kotest-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
 kotest-extensions-junitxml = { module = "io.kotest:kotest-extensions-junitxml", version.ref = "kotest" }
 kotest-extensions-mockwebserver = { module = "io.kotest.extensions:kotest-extensions-mockserver", version.ref = "kotest-mockwebserver" }
 jdom2 = { module = "org.jdom:jdom2", version.ref = "jdom2"}

@@ -68,6 +68,7 @@ dependencies {
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.extensions.junitxml)
     testImplementation(libs.kotest.extensions.mockwebserver)
+    testImplementation(libs.kotest.datatest)
 
     // (Required) Writing and executing Unit Tests on the JUnit Platform
     testImplementation(libs.kotlin.result)

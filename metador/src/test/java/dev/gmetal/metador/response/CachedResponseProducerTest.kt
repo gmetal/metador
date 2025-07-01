@@ -1,7 +1,5 @@
 package dev.gmetal.metador.response
 
-import com.github.michaelbull.result.get
-import com.github.michaelbull.result.getError
 import dev.gmetal.metador.Metador
 import dev.gmetal.metador.ResourceNotFoundException
 import io.kotest.core.spec.style.BehaviorSpec
@@ -111,7 +109,7 @@ class CachedResponseProductTest : BehaviorSpec({
 
                 Then("a ResultNotFoundException is returned") {
                     canHandle shouldBe false
-                    response.getError() shouldBe ResourceNotFoundException
+                    response.exceptionOrNull() shouldBe ResourceNotFoundException
                 }
             }
 
@@ -122,7 +120,7 @@ class CachedResponseProductTest : BehaviorSpec({
 
                 Then("a successful result is returned with the cached data") {
                     canHandle shouldBe true
-                    response.get() shouldBe fakeData
+                    response.getOrNull() shouldBe fakeData
                 }
             }
         }

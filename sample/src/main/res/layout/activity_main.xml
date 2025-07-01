@@ -11,6 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="?attr/colorSurface"
+        android:layout_marginTop="@dimen/web_url_container_top_margin"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -56,8 +57,10 @@
         android:clipToPadding="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/web_url_container"
+        app:layout_constraintVertical_bias="1.0"
         tools:itemCount="5"
         tools:listitem="@layout/item_key_value"
         tools:orientation="vertical" />

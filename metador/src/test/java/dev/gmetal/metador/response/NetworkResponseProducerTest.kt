@@ -1,7 +1,5 @@
 package dev.gmetal.metador.response
 
-import com.github.michaelbull.result.get
-import com.github.michaelbull.result.getError
 import dev.gmetal.metador.HtmlMetaExtractor
 import dev.gmetal.metador.Metador
 import dev.gmetal.metador.ResourceNotFoundException
@@ -16,15 +14,17 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
+@ExperimentalCoroutinesApi
 class NetworkResponseProducerTest : BehaviorSpec({
     lateinit var mockResourceRetriever: ResourceRetriever
     lateinit var mockResourceParserDelegate: ResourceParserDelegate
     lateinit var mockSuccessCallback: Metador.SuccessCallback
     lateinit var mockFailureCallback: Metador.FailureCallback
     lateinit var networkResponseProducerInTest: NetworkResponseProducer
-    val testCoroutineDispatcher: CoroutineDispatcher = TestCoroutineDispatcher()
+    val testCoroutineDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
     fun defaultRequest(
         uri: String,
@@ -65,7 +65,7 @@ class NetworkResponseProducerTest : BehaviorSpec({
                 )
             )
             Then("it delegates the parsing to the request's ResourceParserDelegate") {
-                result.get() shouldBe emptyMap()
+                result.getOrNull() shouldBe emptyMap()
                 verify { mockFailureCallback wasNot called }
                 verify { mockSuccessCallback wasNot called }
             }
@@ -78,7 +78,7 @@ class NetworkResponseProducerTest : BehaviorSpec({
                 defaultRequest("http://localhost/test")
             )
             Then("it is encapsulated in a result and returned") {
-                result.getError() shouldBe ResourceNotFoundException
+                result.exceptionOrNull() shouldBe ResourceNotFoundException
                 verify { mockFailureCallback wasNot called }
                 verify { mockSuccessCallback wasNot called }
             }
@@ -94,7 +94,7 @@ class NetworkResponseProducerTest : BehaviorSpec({
                 defaultRequest("http://localhost/test", mockResourceParserDelegate)
             )
             Then("it is propagated to the failure callback") {
-                result.getError() shouldBe instanceOf(RuntimeException::class)
+                result.exceptionOrNull() shouldBe instanceOf(RuntimeException::class)
                 verify { mockFailureCallback wasNot called }
                 verify { mockSuccessCallback wasNot called }
             }
@@ -110,7 +110,7 @@ class NetworkResponseProducerTest : BehaviorSpec({
             )
 
             Then("it is propagated to the success callback") {
-                result.get() shouldBe expectedResult
+                result.getOrNull() shouldBe expectedResult
                 verify { mockFailureCallback wasNot called }
                 verify { mockSuccessCallback wasNot called }
             }

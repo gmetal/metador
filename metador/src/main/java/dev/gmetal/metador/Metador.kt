@@ -1,7 +1,5 @@
 package dev.gmetal.metador
 
-import com.github.michaelbull.result.Result
-import com.github.michaelbull.result.fold
 import dev.gmetal.metador.Metador.FailureCallback
 import dev.gmetal.metador.response.CachedResponseProducer
 import dev.gmetal.metador.response.NetworkResponseProducer
@@ -42,7 +40,7 @@ class Metador private constructor(
     fun process(request: Request) {
         metadorScope.launch {
             withContext(backgroundDispatcher) {
-                val responseResult: Pair<Result<Map<String, String>, Throwable>, Boolean> = when {
+                val responseResult: Pair<Result<Map<String, String>>, Boolean> = when {
                     cachedResponseProducer.canHandleRequest(request) ->
                         cachedResponseProducer.produceResponse(request) to true
                     else -> networkResponseProducer.produceResponse(request) to false
@@ -69,7 +67,7 @@ class Metador private constructor(
         }
     }
 
-    private fun Pair<Result<Map<String, String>, Throwable>, Boolean>.isNotCached() = !this.second
+    private fun Pair<Result<Map<String, String>>, Boolean>.isNotCached() = !this.second
 
     /**
      * A builder that is used for creating [Metador] instances

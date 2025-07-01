@@ -1,6 +1,5 @@
 package dev.gmetal.metador
 
-import com.github.michaelbull.result.Ok
 import dev.gmetal.metador.response.CachedResponseProducer
 import dev.gmetal.metador.response.ResponseProducer
 import io.kotest.core.spec.style.BehaviorSpec
@@ -16,10 +15,12 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyAll
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 
+@ExperimentalCoroutinesApi
 class MetadorTest : BehaviorSpec({
     lateinit var mockResourceRetriever: ResourceRetriever
     lateinit var mockSuccessCallback: Metador.SuccessCallback
@@ -33,7 +34,7 @@ class MetadorTest : BehaviorSpec({
         mockFailureCallback = mockk()
         mockCachedResponseProducer = mockk()
         mockNetworkResponseProducer = mockk()
-        Dispatchers.setMain(TestCoroutineDispatcher())
+        Dispatchers.setMain(UnconfinedTestDispatcher())
     }
 
     afterContainer {
@@ -91,7 +92,7 @@ class MetadorTest : BehaviorSpec({
 
         When("a cached response is available") {
             every { mockCachedResponseProducer.canHandleRequest(any()) } returns true
-            coEvery { mockCachedResponseProducer.produceResponse(request) } returns Ok(
+            coEvery { mockCachedResponseProducer.produceResponse(request) } returns Result.success(
                 expectedResult
             )
 
@@ -115,7 +116,7 @@ class MetadorTest : BehaviorSpec({
         When("no cached responses are available") {
             every { mockCachedResponseProducer.cacheResponse(any(), any(), any()) } just Runs
             every { mockCachedResponseProducer.canHandleRequest(any()) } returns false
-            coEvery { mockNetworkResponseProducer.produceResponse(any()) } returns Ok(
+            coEvery { mockNetworkResponseProducer.produceResponse(any()) } returns Result.success(
                 expectedResult
             )
 
@@ -140,6 +141,7 @@ class MetadorTest : BehaviorSpec({
     }
 })
 
+@ExperimentalCoroutinesApi
 private fun metadorBuilder(
     resourceRetriever: ResourceRetriever = OkHttp3ResourceRetriever(),
     cacheDirectory: String = "",
@@ -152,7 +154,7 @@ private fun metadorBuilder(
     .withPhysicalCacheSize(physicalCacheSize)
     .withResponseCacheSize(responseCacheSize)
     .withResourceRetriever(resourceRetriever)
-    .withBackgroundDispatcher(TestCoroutineDispatcher())
+    .withBackgroundDispatcher(UnconfinedTestDispatcher())
     .apply {
         if (cachedResponseProducer != null) {
             withCachedResponseProducer(cachedResponseProducer)

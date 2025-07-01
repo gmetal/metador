@@ -6,12 +6,14 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 
+@ExperimentalCoroutinesApi
 class ResourceParserTest : BehaviorSpec({
     lateinit var mockResourceParserDelegate: ResourceParserDelegate
     lateinit var objectInTest: ResourceParser
-    val testCoroutineDispatcher = TestCoroutineDispatcher()
+    val testCoroutineDispatcher = UnconfinedTestDispatcher()
 
     beforeContainer {
         mockResourceParserDelegate = mockk()

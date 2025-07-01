@@ -2,6 +2,7 @@ package dev.gmetal.metador
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
+import org.jsoup.nodes.Node
 import org.jsoup.select.Elements
 
 private const val META_ELEMENT = "meta"
@@ -21,15 +22,15 @@ class HtmlMetaExtractor : ResourceParserDelegate {
         val elements: Elements = body.head().getElementsByTag(META_ELEMENT)
 
         return elements
+            .asList()
             .filter { it.isMetaElement() }
-            .map { element -> element.metaName() to element.metaValue() }
-            .toMap()
+            .associate { element -> element.metaName() to element.metaValue() }
     }
 
     override fun parseResource(resource: String): Map<String, String> =
         parse(resource)
 
-    private fun Element.isMetaElement(): Boolean =
+    private fun Node.isMetaElement(): Boolean =
         (hasAttr(NAME_ATTRIBUTE) || hasAttr(PROPERTY_ATTRIBUTE) || hasAttr(ITEMPROP_ATTRIBUTE)) && hasAttr(
             CONTENT_ATTRIBUTE
         )

@@ -1,8 +1,5 @@
 package dev.gmetal.metador.response
 
-import com.github.michaelbull.result.Err
-import com.github.michaelbull.result.Ok
-import com.github.michaelbull.result.Result
 import dev.gmetal.metador.Clock
 import dev.gmetal.metador.DEFAULT_MAX_AGE_CACHE_SECONDS
 import dev.gmetal.metador.Metador
@@ -26,10 +23,10 @@ class CachedResponseProducer(
     override fun canHandleRequest(request: Metador.Request): Boolean =
         request.cachedResponseAllowed() && parsedResponseCache.containsKey(request.uri)
 
-    override suspend fun produceResponse(request: Metador.Request): Result<Map<String, String>, Throwable> =
+    override suspend fun produceResponse(request: Metador.Request): Result<Map<String, String>> =
         when {
-            parsedResponseCache.containsKey(request.uri) -> Ok(parsedResponseCache[request.uri]!!)
-            else -> Err(ResourceNotFoundException)
+            parsedResponseCache.containsKey(request.uri) -> Result.success(parsedResponseCache[request.uri]!!)
+            else -> Result.failure(ResourceNotFoundException)
         }
 
     fun cacheResponse(

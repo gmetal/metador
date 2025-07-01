@@ -1,6 +1,5 @@
 package dev.gmetal.metador.response
 
-import com.github.michaelbull.result.Result
 import dev.gmetal.metador.Metador
 
 /**
@@ -22,5 +21,5 @@ interface ResponseProducer {
      * @param request the request to check
      * @return a Result-wrapped map, that indicates if the response was successful or not
      */
-    suspend fun produceResponse(request: Metador.Request): Result<Map<String, String>, Throwable>
+    suspend fun produceResponse(request: Metador.Request): Result<Map<String, String>>
 }

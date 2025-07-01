@@ -1,10 +1,49 @@
 import org.jetbrains.dokka.gradle.DokkaTask
 
 plugins {
-    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.android.junit5)
-    alias(libs.plugins.dokka)
+    alias(libs.plugins.dokka)}
+
+kotlin {
+    androidTarget()
+
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.okhttp)
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation(libs.kotest.assertions.core)
+                implementation(libs.kotest.extensions.junitxml)
+                implementation(libs.kotest.extensions.mockwebserver)
+                implementation(libs.kotest.datatest)
+            }
+        }
+        androidMain {
+            dependencies {
+                implementation(libs.jsoup)
+                implementation(libs.annotation)
+                implementation(libs.kotlinx.coroutines.android)
+            }
+        }
+        androidUnitTest {
+            dependencies {
+                implementation(libs.kotest.runner.junit5)
+                implementation(libs.mockk)
+                implementation(libs.jetbrains.kotlinx.coroutines.test)
+                implementation(libs.slf4j.simple)
+                implementation(libs.slf4j.slf4j.api)
+                implementation(libs.mockk.agent)
+                implementation(libs.kotlin.reflect)
+                implementation(libs.jdom2)
+            }
+        }
+    }
 }
 
 android {
@@ -32,17 +71,13 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-
     namespace = "dev.gmetal.metador"
 }
 
 tasks.withType<DokkaTask> {
     moduleName.set("Metador")
     offlineMode.set(true)
-    dokkaSourceSets.getByName("main"){
+    dokkaSourceSets.getByName("commonMain"){
         displayName.set("main")
         includes.from("description.md")
         jdkVersion.set(8)
@@ -52,31 +87,6 @@ tasks.withType<DokkaTask> {
         noJdkLink.set(false)
         noAndroidSdkLink.set(false)
     }
-}
-
-dependencies {
-    implementation(libs.okhttp)
-    implementation(libs.jsoup)
-    implementation(libs.annotation)
-    implementation(libs.kotlin.stdlib.jdk7)
-    implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.coroutines.android)
-
-    // Kotest dependencies
-    testImplementation(libs.kotest.runner.junit5)
-    testImplementation(libs.kotest.assertions.core)
-    testImplementation(libs.kotest.extensions.junitxml)
-    testImplementation(libs.kotest.extensions.mockwebserver)
-    testImplementation(libs.kotest.datatest)
-
-    // (Required) Writing and executing Unit Tests on the JUnit Platform
-    testImplementation(libs.mockk)
-    testImplementation(libs.jetbrains.kotlinx.coroutines.test)
-    testImplementation(libs.slf4j.simple)
-    testImplementation(libs.slf4j.slf4j.api)
-    testImplementation(libs.mockk.agent)
-    testImplementation(libs.kotlin.reflect)
-    testImplementation(libs.jdom2)
 }
 
 val archiveSources by tasks.registering(Jar::class) {

@@ -1,6 +1,5 @@
 package dev.gmetal.metador
 
-import dev.gmetal.metador.Metador.FailureCallback
 import dev.gmetal.metador.response.CachedResponseProducer
 import dev.gmetal.metador.response.NetworkResponseProducer
 import dev.gmetal.metador.response.ResponseProducer
@@ -43,6 +42,7 @@ class Metador private constructor(
                 val responseResult: Pair<Result<Map<String, String>>, Boolean> = when {
                     cachedResponseProducer.canHandleRequest(request) ->
                         cachedResponseProducer.produceResponse(request) to true
+
                     else -> networkResponseProducer.produceResponse(request) to false
                 }
 
@@ -73,7 +73,7 @@ class Metador private constructor(
      * A builder that is used for creating [Metador] instances
      */
     class Builder {
-        private var resourceRetriever: ResourceRetriever = OkHttp3ResourceRetriever()
+        private var resourceRetriever: ResourceRetriever = defaultResourceRetriever()
         private var cacheDirectory: String = ""
         private var physicalCacheSize: Long = DEFAULT_PHYSICAL_CACHE_SIZE_BYTES
         private var responseCacheSize: Int = DEFAULT_MAX_RESPONSE_CACHE_SIZE
@@ -218,7 +218,7 @@ class Metador private constructor(
             private var successCallback: SuccessCallback? = null
             private var failureCallback: FailureCallback? = null
             private var maxSecondsCached: Int = DEFAULT_MAX_AGE_CACHE_SECONDS
-            private var resourceParserDelegate: ResourceParserDelegate = HtmlMetaExtractor()
+            private var resourceParserDelegate: ResourceParserDelegate? = null
 
             /**
              * The callback to be used for notifying about a successful result
@@ -283,7 +283,7 @@ class Metador private constructor(
                 Request(
                     url,
                     maxSecondsCached,
-                    resourceParserDelegate,
+                    resourceParserDelegate ?: defaultResourceParserDelegate(),
                     successCallback
                         ?: throw RuntimeException("Success callback is required"),
                     failureCallback ?: FailureCallback { }
@@ -316,3 +316,6 @@ class Metador private constructor(
         fun onError(throwable: Throwable)
     }
 }
+
+internal expect fun defaultResourceRetriever(): ResourceRetriever
+internal expect fun defaultResourceParserDelegate(): ResourceParserDelegate

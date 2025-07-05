@@ -1,30 +1,32 @@
 [versions]
-agp = "8.11.0"
+agp = "8.10.0"
 minSdk = "21"
 compileSdk = "35"
 targetSdk = "35"
 kotlin = "2.1.21"
+android-junit5 = "1.13.0.0"
 annotation = "1.9.1"
 appcompat = "1.7.1"
 constraintlayout = "2.2.1"
 coreKtx = "1.16.0"
-espressoCore = "3.6.1"
-jsoup = "1.21.1"
-junit = "1.2.1"
-material = "1.12.0"
-slf4jApi = "2.0.17"
-slf4jSimple = "2.0.17"
 coroutines = "1.10.2"
 dokka = "2.0.0"
+espressoCore = "3.6.1"
+jdom2 = "2.0.6.1"
+jsoup = "1.21.1"
+junit = "1.2.1"
 kotest = "5.9.1"
 kotest-mockwebserver = "1.3.0"
-okhttp = "4.12.0"
+kotlincrypt-hash = "0.7.0"
+kotlinx-io = "0.8.0"
+ktor = "3.2.0"
+material = "1.12.0"
 mockk = "1.14.4"
 mockk-agent = "1.14.4"
-slf4j = "1.7.30"
-jdom2 = "2.0.6.1"
+okhttp = "4.12.0"
+slf4jApi = "2.0.17"
+slf4jSimple = "2.0.17"
 spotless = "7.0.4"
-android-junit5 = "1.13.0.0"
 
 [libraries]
 annotation = { module = "androidx.annotation:annotation", version.ref = "annotation" }
@@ -35,11 +37,16 @@ espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref =
 jetbrains-kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { module = "androidx.test.ext:junit", version.ref = "junit" }
+kotlin-crypto-hash = { module = "org.kotlincrypto.hash:bom", version.ref = "kotlincrypt-hash" }
+kotlin-crypto-hash-sha2 = { module = "org.kotlincrypto.hash:sha2" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
 kotlin-stdlib-jdk7 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-io = { module = "org.jetbrains.kotlinx:kotlinx-io-core", version.ref = "kotlinx-io" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-agent = { module = "io.mockk:mockk-agent-jvm", version.ref = "mockk-agent" }

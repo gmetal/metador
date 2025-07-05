@@ -13,7 +13,11 @@ kotlin {
         commonMain {
             dependencies {
                 implementation(libs.kotlinx.coroutines.core)
-                implementation(libs.okhttp)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.cio)
+                implementation(libs.kotlinx.io)
+                implementation(project.dependencies.platform(libs.kotlin.crypto.hash))
+                implementation(libs.kotlin.crypto.hash.sha2)
             }
         }
         commonTest {
@@ -26,6 +30,7 @@ kotlin {
         }
         androidMain {
             dependencies {
+                implementation(libs.okhttp)
                 implementation(libs.jsoup)
                 implementation(libs.annotation)
                 implementation(libs.kotlinx.coroutines.android)

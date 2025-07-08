@@ -16,6 +16,7 @@ kotlin {
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.cio)
                 implementation(libs.kotlinx.io)
+                implementation(libs.ksoup)
                 implementation(project.dependencies.platform(libs.kotlin.crypto.hash))
                 implementation(libs.kotlin.crypto.hash.sha2)
             }

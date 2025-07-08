@@ -19,7 +19,7 @@ kotest = "5.9.1"
 kotest-mockwebserver = "1.3.0"
 kotlincrypt-hash = "0.7.0"
 kotlinx-io = "0.8.0"
-ktor = "3.2.0"
+ktor = "3.2.1"
 material = "1.12.0"
 mockk = "1.14.4"
 mockk-agent = "1.14.4"
@@ -58,7 +58,7 @@ kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.
 kotest-datatest = { module = "io.kotest:kotest-framework-datatest", version.ref = "kotest" }
 kotest-extensions-junitxml = { module = "io.kotest:kotest-extensions-junitxml", version.ref = "kotest" }
 kotest-extensions-mockwebserver = { module = "io.kotest.extensions:kotest-extensions-mockserver", version.ref = "kotest-mockwebserver" }
-jdom2 = { module = "org.jdom:jdom2", version.ref = "jdom2"}
+jdom2 = { module = "org.jdom:jdom2", version.ref = "jdom2" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -66,6 +66,6 @@ androidLibrary = { id = "com.android.library", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref= "android-junit5" }
+android-junit5 = { id = "de.mannodermaus.android-junit5", version.ref = "android-junit5" }
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 dokka = { id = "org.jetbrains.dokka", version.ref = "dokka" }

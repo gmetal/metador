@@ -25,7 +25,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "metador"
+rootProject.name = "metador-lib"
 include(":sample")
 include(":metador")
 

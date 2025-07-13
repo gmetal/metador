@@ -4,7 +4,10 @@ plugins {
     alias(libs.plugins.kotlin.multiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.android.junit5)
-    alias(libs.plugins.dokka)}
+    alias(libs.plugins.dokka)
+}
+
+group = "dev.gmetal"
 
 kotlin {
     androidTarget()

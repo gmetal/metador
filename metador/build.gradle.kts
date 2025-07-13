@@ -11,6 +11,7 @@ group = "dev.gmetal"
 
 kotlin {
     androidTarget()
+    jvm()
 
     sourceSets {
         commonMain {
@@ -52,7 +53,17 @@ kotlin {
                 implementation(libs.jdom2)
             }
         }
+        jvmTest {
+            dependencies {
+                implementation(libs.kotest.runner.junit5)
+                implementation(libs.mockk)
+            }
+        }
     }
+}
+
+tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
 }
 
 android {
@@ -86,7 +97,7 @@ android {
 tasks.withType<DokkaTask> {
     moduleName.set("Metador")
     offlineMode.set(true)
-    dokkaSourceSets.getByName("commonMain"){
+    dokkaSourceSets.getByName("commonMain") {
         displayName.set("main")
         includes.from("description.md")
         jdkVersion.set(8)

@@ -1,10 +1,10 @@
 package dev.gmetal.metador.response
 
-import dev.gmetal.metador.HtmlMetaExtractor
 import dev.gmetal.metador.Metador
 import dev.gmetal.metador.ResourceNotFoundException
 import dev.gmetal.metador.ResourceParserDelegate
 import dev.gmetal.metador.ResourceRetriever
+import dev.gmetal.metador.defaultResourceParserDelegate
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.instanceOf
@@ -28,7 +28,7 @@ class NetworkResponseProducerTest : BehaviorSpec({
 
     fun defaultRequest(
         uri: String,
-        resourceParserDelegate: ResourceParserDelegate = HtmlMetaExtractor()
+        resourceParserDelegate: ResourceParserDelegate = defaultResourceParserDelegate()
     ): Metador.Request =
         Metador.Request.Builder(uri)
             .withResourceParser(resourceParserDelegate)

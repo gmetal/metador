@@ -143,7 +143,7 @@ class MetadorTest : BehaviorSpec({
 
 @ExperimentalCoroutinesApi
 private fun metadorBuilder(
-    resourceRetriever: ResourceRetriever = OkHttp3ResourceRetriever(),
+    resourceRetriever: ResourceRetriever = defaultResourceRetriever(),
     cacheDirectory: String = "",
     physicalCacheSize: Long = DEFAULT_PHYSICAL_CACHE_SIZE_BYTES,
     responseCacheSize: Int = DEFAULT_MAX_RESPONSE_CACHE_SIZE,
@@ -171,7 +171,7 @@ private fun defaultRequest(
     uri: String,
     successCallback: Metador.SuccessCallback,
     failureCallback: Metador.FailureCallback,
-    resourceParserDelegate: ResourceParserDelegate = HtmlMetaExtractor()
+    resourceParserDelegate: ResourceParserDelegate = defaultResourceParserDelegate()
 ): Metador.Request =
     Metador.Request.Builder(uri)
         .withResourceParser(resourceParserDelegate)

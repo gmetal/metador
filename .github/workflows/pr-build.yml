@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Test
-        run: ./gradlew testDebug
+        run: ./gradlew jvmTest testDebug
       - name: Generate Test Report
         uses: dorny/test-reporter@v1
         if: always()

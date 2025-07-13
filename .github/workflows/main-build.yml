@@ -17,5 +17,5 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Test
-        run: ./gradlew testDebug
+        run: ./gradlew jvmTest testDebug
 
